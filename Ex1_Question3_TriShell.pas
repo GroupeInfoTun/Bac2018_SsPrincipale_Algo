@@ -1,75 +1,67 @@
 Program Ex1_Question3_TriShell;
 Uses Wincrt;
-Type
-  Tab = Array[1..20] Of Byte;
-Var
-  Ti, Tr: Tab;
-  N, P: Byte;
-{===================================================}
-Function Tri_Shell(Var T:Tab; N, P:Byte): Byte;
-Var
-  Kes, i, j, NombreDeDecalage : Integer;
+{=================================================}
+Function Inconnue(E, k:Integer): Boolean;
 Begin
-  NombreDeDecalage := 0;
-  While (P <> 1) Do
-    Begin
-      P := P Div 3 + Ord(P Div 3 = 0);
-      For i := P+1 To N Do
-        Begin
-          Kes := T[i];
-          j := i;
-          While (j > P) And (T[j - P] > Kes) Do
-            Begin
-              T[j] := T[j - P];
-              j := j - P;
-              Inc(NombreDeDecalage);
-            End;
-          T[j] := Kes;
-        End;
-    End;
-  Tri_Shell := NombreDeDecalage;
+  If (E<2) Or (E Mod k=0) Then Inconnue := False
+  Else If k>Sqrt(E) Then Inconnue := True
+  Else Inconnue := Inconnue(E, K+1);
 End;
-{===================================================}
-Procedure Afficher(T:Tab; N:Integer);
+{=================================================}
+Function Calcul_Version_Opt(Epsilon:Real): Real;
 Var
+  Pi_Actuel, Pi_Precedent: Real;
   i: Integer;
 Begin
-  For i:=1 To N Do Write(T[i]:4);
-  Writeln(#10#10);
+  Pi_Actuel := Sqrt(6*Sqr(2)/(Sqr(2)-1));
+  i := 2;
+  Repeat
+    i := i+1;
+    While Not Inconnue(i,2) Do i := i+1;
+    Pi_Precedent := Pi_Actuel;
+    Pi_Actuel := Pi_Actuel*(Sqrt(Sqr(i)/(Sqr(i)-1)));
+  Until Abs(Pi_Actuel-Pi_Precedent)<=Epsilon;
+  Calcul_Version_Opt := Pi_Actuel
 End;
-{===================================================}
-Procedure Remplir(Var T:Tab; N:Integer);
+{=================================================}
+Function Calcul_Version_1(Epsilon:Real): Real;
 Var
+  Pi_Actuel, Pi_Precedent: Real;
   i: Integer;
 Begin
-  For i:=1 To N Do T[i] := 10+Random(90);
+  Pi_Actuel := Sqrt(6*Sqr(2)/(Sqr(2)-1));
+  i := 2;
+  Repeat
+    i := i+1;
+    If Inconnue(i,2) Then
+      Begin
+        Pi_Precedent := Pi_Actuel;
+        Pi_Actuel := Pi_Actuel*(Sqrt(Sqr(i)/(Sqr(i)-1)));
+      End;
+  Until Abs(Pi_Actuel-Pi_Precedent)<=Epsilon;
+  Calcul_Version_1 := Pi_Actuel
 End;
-{===================================================}
+{=================================================}
+Function Calcul_Version_2(Epsilon:Real): Real;
+Var
+  Zeta_Actuel, Zeta_Precedent: Real;
+  i: Integer;
 Begin
-  Randomize;
-  N := 5+Random(16);
-  Remplir(Ti, N);
-  Writeln('0-Tableau initial:'#10);
-  Afficher(Ti, N);
-{1- Calcul de l'Espacement P: P(0)=0, P(n)=3+P(n-1) }
-  P := 0;
-  While (P < N) Do P := 3 + P;
-  Tr := Ti;
-  Writeln('1-Calcul de l''Espacement P: P(0)=0, P(n)=3+P(n-1)');
-  Writeln('1-Nombre de décalages: ',Tri_Shell(Tr, N, P),#10);
-  Afficher(Tr, N);
-{2- Calcul de l'Espacement P: P(0)=1, P(n)=2*P(n-1) }
-  P := 1;
-  While (P < N) Do P := 2 * P;
-  Tr := Ti;
-  Writeln('2-Calcul de l''Espacement P: P(0)=1, P(n)=2*P(n-1)');
-  Writeln('2-Nombre de décalages: ',Tri_Shell(Tr, N, P),#10);
-  Afficher(Tr, N);
-{3- Calcul de l'Espacement P: P(0)=1, P(n)=3*P(n-1) + 1 }
-  P := 1;
-  While (P < N) Do P := 3 * P + 1;
-  Tr := Ti;
-  Writeln('3-Calcul de l''Espacement P: P(0)=1, P(n)=3*P(n-1) + 1');
-  Writeln('3-Nombre de décalages: ',Tri_Shell(Tr, N, P),#10);
-  Afficher(Tr, N);
+  Zeta_Actuel := Sqr(2)/(Sqr(2)-1);
+  i := 2;
+  Repeat
+    i := i+1;
+    If Inconnue(i,2) Then
+      Begin
+        Zeta_Precedent := Zeta_Actuel;
+        Zeta_Actuel := Zeta_Actuel*(Sqr(i)/(Sqr(i)-1));
+      End;
+  Until Abs(Sqrt(6*Zeta_Actuel)-Sqrt(6*Zeta_Precedent))<=Epsilon;
+  Calcul_Version_2 := Sqrt(6*Zeta_Actuel)
+End;
+{=================================================}
+Begin
+  Writeln(Calcul_Version_Opt(1e-8): 0: 9);
+  Writeln(Calcul_Version_1(1e-8): 0: 9);
+  Writeln(Calcul_Version_2(1e-8): 0: 9);
 End.
