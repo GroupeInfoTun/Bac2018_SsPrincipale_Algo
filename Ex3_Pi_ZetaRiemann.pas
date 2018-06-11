@@ -8,6 +8,22 @@ Begin
   Else Inconnue := Inconnue(E, K+1);
 End;
 {=================================================}
+Function Calcul_Version_Opt(Epsilon:Real): Real;
+Var
+  Pi_Actuel, Pi_Precedent: Real;
+  i: Integer;
+Begin
+  Pi_Actuel := Sqrt(6*Sqr(2)/(Sqr(2)-1));
+  i := 2;
+  Repeat
+    i := i+1;
+    While Not Inconnue(i,2) Do i := i+1;
+    Pi_Precedent := Pi_Actuel;
+    Pi_Actuel := Pi_Actuel*(Sqrt(Sqr(i)/(Sqr(i)-1)));
+  Until Abs(Pi_Actuel-Pi_Precedent)<=Epsilon;
+  Calcul_Version_Opt := Pi_Actuel
+End;
+{=================================================}
 Function Calcul_Version_1(Epsilon:Real): Real;
 Var
   Pi_Actuel, Pi_Precedent: Real;
@@ -45,6 +61,7 @@ Begin
 End;
 {=================================================}
 Begin
+  Writeln(Calcul_Version_Opt(1e-8): 0: 9);
   Writeln(Calcul_Version_1(1e-8): 0: 9);
   Writeln(Calcul_Version_2(1e-8): 0: 9);
 End.
